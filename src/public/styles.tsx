@@ -1,5 +1,5 @@
 'use strict';
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   view: {
@@ -15,17 +15,36 @@ export const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
   },
-  subHeading: {
-    fontSize: 15,
+  heading2: {
+    fontSize: 20,
     marginBottom: 10,
     marginLeft: 10,
     marginRight: 10,
+    fontWeight: 'bold',
+  },
+  heading3: {
+    fontSize: 24,
+    marginBottom: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    fontWeight: 'bold',
+    color: 'green',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  subHeading: {
+    fontSize: 15,
+    marginTop: 30,
+    marginLeft: 10,
+    marginRight: 10,
+    fontWeight: 'bold',
   },
   input: {
     fontSize: 20,
     paddingBottom: 10,
     borderBottomWidth: 1,
     marginVertical: 20,
+    marginTop: -30,
   },
   button: {
     alignItems: 'center',
@@ -59,5 +78,33 @@ export const styles = StyleSheet.create({
     marginTop: 40,
     justifyContent: 'center',
     color: '#00B4FF',
+  },
+  checkboxWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 5,
+  },
+  checkboxLabel: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  checkboxLabel2: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'red',
+  },
+  Image: {
+    shadowColor: "black",
+    shadowOffset: {
+      width: -10,
+      height: 9,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    elevation: 5,
+    alignItems: "center",
+    height: "20%",
+    width: "40%",
+
   },
 });
