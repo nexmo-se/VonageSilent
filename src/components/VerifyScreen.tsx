@@ -22,50 +22,54 @@ const VerifyScreen = ({
       setIsPinValidState(false);
     }
   }, [pin]);
+
+  const cancelHandler = async () => {
+    navigation.navigate('Login');
+  }
   const verifyHandler = async () => {
-      const body = {
-        request_id: route?.params?.requestId,
-        pin: pin,
-      };
-      console.log(`pin in verify from login code: ${pin}`);
-      const deviceToken = await getDeviceToken();
-      const response = await fetch(`${SERVER_BASE_URL}/verify`, {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          'Content-Type': 'application/json',
-          'silent-auth': deviceToken.token,
-          'device-id': deviceToken.deviceId,
-        },
-      });
+    const body = {
+      request_id: route?.params?.requestId,
+      pin: pin,
+    };
+    console.log(`pin in verify from login code: ${pin}`);
+    const deviceToken = await getDeviceToken();
+    const response = await fetch(`${SERVER_BASE_URL}/verify`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+        'silent-auth': deviceToken.token,
+        'device-id': deviceToken.deviceId,
+      },
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.status === 200) {
-        console.log('Verified! Go to Secure Page!!');
-        setPin('');
+    if (response.status === 200) {
+      console.log('Verified! Go to Secure Page!!');
+      setPin('');
 
-        try {
-          await AsyncStorage.setItem('@auth', data.token);
-          navigation.navigate('Secure');
-        } catch (e) {
-          console.log(e);
-        }
-      } else if (response.status === 400) {
-        console.log('Verification Pin incorrect!!');
-        setErrorMessage('Incorrect pin entered. Please retry');
-        setPin('');
-      } else if (response.status === 409) {
-        console.log("Workflow doesn't require a pin.");
-        setErrorMessage(
-          'A pin is not required for this step of the verification process.',
-        );
-        setPin('');
-      } else {
-        console.log('Verification does not exist or has expired!!');
-        setPin('');
-        navigation.navigate('Login', { errorMessage: data?.error });
+      try {
+        await AsyncStorage.setItem('@auth', data.token);
+        navigation.navigate('Secure');
+      } catch (e) {
+        console.log(e);
       }
+    } else if (response.status === 400) {
+      console.log('Verification Pin incorrect!!');
+      setErrorMessage('Incorrect pin entered. Please retry');
+      setPin('');
+    } else if (response.status === 409) {
+      console.log("Workflow doesn't require a pin.");
+      setErrorMessage(
+        'A pin is not required for this step of the verification process.',
+      );
+      setPin('');
+    } else {
+      console.log('Verification does not exist or has expired!!');
+      setPin('');
+      navigation.navigate('Login', { errorMessage: data?.error });
+    }
   };
 
   return (
@@ -82,7 +86,7 @@ const VerifyScreen = ({
 
       <TextInput
         style={styles.input}
-        placeholder="Verification Pin"
+        placeholder="Enter Verification Pin"
         keyboardType="numeric"
         returnKeyType="done"
         autoCapitalize="none"
@@ -95,6 +99,13 @@ const VerifyScreen = ({
         style={[styles.button, styles.enabledButton]}>
         <Text style={styles.buttonText}>Verify Me!</Text>
       </TouchableOpacity>
+      <Text></Text>
+      <TouchableOpacity
+        onPress={cancelHandler}
+        style={[styles.button, styles.enabledButton]}>
+        <Text style={styles.buttonText}>Cancel Request</Text>
+      </TouchableOpacity>
+
     </View>
   );
 };
