@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {TouchableOpacity, View, Text} from 'react-native';
+import {TouchableOpacity, View, Text, Image} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {SERVER_BASE_URL} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -54,23 +54,30 @@ const SecureScreen = ({navigation}: StackScreenProps<{HomeScreen: any}>) => {
       console.log(e);
     }
 
-    navigation.navigate('Login');
+    navigation.navigate('Home');
   };
 
   return (
     <View style={styles.view}>
-      <Text style={styles.heading}>
-        Welcome to the Secure Section of the Vonage SilentAuth Demo Application
+      <Image source={require('../assets/vonage.png')} style={styles.Image}/>
+      <Text style={styles.heading}>Welcome to the</Text>
+      <Text style={styles.heading2}>Vonage SilentAuth</Text>
+      <Text style={styles.heading2}>Demo Application</Text>
+      <Text style={styles.heading3}>
+        Congratulations!
+      </Text>
+      <Text style={styles.heading3}>
+        Your verification was
+      </Text>
+      <Text style={styles.heading3}>
+        SUCCESSFUL!
       </Text>
       <Text style={styles.subHeading}>
-        This is a secure screen! You will only see this if you've verified
-        yourself with your phone number.
+       Authenticated number: {phoneNumber}.
       </Text>
-      <Text style={styles.subHeading}>
-        Here is your phone number, retrieved from an authenticated endpoint on
-        the server: {phoneNumber}.
-      </Text>
-      <TouchableOpacity onPress={logoutHandler} style={[styles.button, styles.enabledButton]}>
+      <TouchableOpacity
+        onPress={logoutHandler}
+        style={[styles.button, styles.enabledButton]}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </View>
