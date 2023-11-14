@@ -195,6 +195,7 @@ const LoginScreen = ({
       <PhoneInput
         defaultValue={defaultNumber}
         defaultCode="US"
+        textInputProps={{returnKeyType:"done"}}
         onChangeText={text => {
           setInputNumber(text);
         }}
