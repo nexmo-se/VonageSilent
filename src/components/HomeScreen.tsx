@@ -1,6 +1,6 @@
 // screens/Home.js
 import React, {useEffect} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
+import {View, Text, TouchableOpacity, Image} from 'react-native';
 import {getUniqueId} from 'react-native-device-info';
 import {SERVER_BASE_URL} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -40,7 +40,6 @@ async function createDeviceToken() {
 function HomeScreen({navigation}: Props) {
   const onScreenLoad = async () => {
     createDeviceToken();
-    console.log("onScreenLoad creating token")
   };
 
   useEffect(() => {
@@ -49,11 +48,14 @@ function HomeScreen({navigation}: Props) {
 
   return (
     <View style={styles.view}>
-      <Text style={styles.heading}>Welcome to the Vonage SilentAuth Demo Application</Text>
+      <Image source={require('../assets/vonage.png')} style={styles.Image}/>
+      <Text style={styles.heading}>Welcome to the</Text>
+      <Text style={styles.heading2}>Vonage SilentAuth</Text>
+      <Text style={styles.heading2}>Demo Application</Text>
       <TouchableOpacity
         onPress={() => navigation.navigate('Login')}
         style={[styles.button, styles.enabledButton]}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>Start</Text>
       </TouchableOpacity>
     </View>
   );
