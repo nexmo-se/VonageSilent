@@ -84,6 +84,7 @@ const VerifyScreen = ({
         style={styles.input}
         placeholder="Verification Pin"
         keyboardType="numeric"
+        returnKeyType="done"
         autoCapitalize="none"
         onChangeText={text => setPin(text)}
         value={pin}
