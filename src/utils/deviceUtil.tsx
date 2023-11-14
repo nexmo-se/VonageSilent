@@ -17,7 +17,7 @@ export async function getPhone() {
     var phone = await AsyncStorage.getItem('@phone');
     var country = await AsyncStorage.getItem('@country');
     console.log("Phone from async: "+phone)
-    if (phone == null) phone = '4083645655';
+    if (phone == null) phone = '';
     if (country == null) country = 'US';
     return {phone, country};
   } catch (e) {
