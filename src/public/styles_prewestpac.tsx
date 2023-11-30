@@ -46,9 +46,8 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'white',
     marginVertical: 20,
-    marginTop: -1,
+    marginTop: -30,
   },
   button: {
     alignItems: 'center',
@@ -71,15 +70,10 @@ export const styles = StyleSheet.create({
   enabledButton: {
     backgroundColor: '#1955ff',
   },
-  bottomButton: {
-    position: 'absolute',
-    bottom: 30,
-  },
   errorText: {
-    color: 'white',
-    backgroundColor: 'red',
-    fontSize: 20,
-    marginBottom: 10,
+    color: '#FF0000',
+    fontSize: 15,
+    marginBottom: 20,
     marginLeft: 20,
     marginRight: 20,
   },
@@ -135,12 +129,6 @@ export const styles = StyleSheet.create({
   },
   white: {
     color: 'white',
-    textShadowColor: 'rgba(0, 0, 0, 1.75)',
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
-  },
-  pinkish: {
-    color: 'pink',
     textShadowColor: 'rgba(0, 0, 0, 1.75)',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 10,

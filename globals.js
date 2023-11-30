@@ -1,2 +1,2 @@
-global.myCountry = 'US';
+global.myCountry = 'AU';
 global.myPhone = '';

@@ -1,16 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, TextInput} from 'react-native';
-import {StackScreenProps} from '@react-navigation/stack';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, TextInput, Image, ImageBackground } from 'react-native';
+import { StackScreenProps } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getDeviceToken} from '../utils/deviceUtil';
-import {styles} from '../public/styles';
-
-import {SERVER_BASE_URL} from '@env';
-
+import { getDeviceToken, getServer } from '../utils/deviceUtil';
+import { styles } from '../public/styles';
+import { FLAVOR, LOGO, BACKGROUND } from '@env'
+const logo = LOGO ? LOGO : 'vonage.png';
+var back = '';
+console.log("ENV Background is " + BACKGROUND);
+if (BACKGROUND !== undefined) {
+  back = require('../assets/wpback.jpeg');
+}
 const VerifyScreen = ({
   navigation,
   route,
-}: StackScreenProps<{HomeScreen: any}>) => {
+}: StackScreenProps<{ HomeScreen: any }>) => {
   const [pin, setPin] = useState('');
   const [isPinValidState, setIsPinValidState] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -23,10 +27,19 @@ const VerifyScreen = ({
     }
   }, [pin]);
 
+  const cancelHandler = async () => {
+    navigation.navigate('Login');
+  }
   const verifyHandler = async () => {
-    const body = {request_id: route?.params?.requestId, pin: pin};
+    const body = {
+      request_id: route?.params?.requestId,
+      pin: pin,
+    };
+    console.log(`pin in verify from login code: ${pin}`);
     const deviceToken = await getDeviceToken();
-    const response = await fetch(`${SERVER_BASE_URL}/verify`, {
+    const server = await getServer();
+
+    const response = await fetch(`${server}/verify`, {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {
@@ -61,30 +74,47 @@ const VerifyScreen = ({
     } else {
       console.log('Verification does not exist or has expired!!');
       setPin('');
-      navigation.navigate('Login', {errorMessage: data?.error});
+      navigation.navigate('Login', { errorMessage: data?.error });
     }
   };
 
   return (
     <View style={styles.view}>
-      <Text style={styles.heading}>Welcome to the Vonage SilentAuth Demo Application</Text>
-      <Text style={styles.subHeading}>
-        Please enter your verification code to continue.
-      </Text>
-      <Text style={styles.errorText}>{errorMessage}</Text>
+      <ImageBackground source={back} resizeMode="cover" style={styles.Background} >
+        <View style={styles.overlay}>
+          <Image source={require('../assets/' + logo)} style={styles.Image} />
+          <Text style={[styles.heading, styles.white]} >Welcome to the</Text>
+          <Text style={[styles.heading2, styles.white]}>{FLAVOR == 'westpac' ? 'Westpac' : 'Vonage'} SilentAuth</Text>
+          <Text style={[styles.heading2, styles.white]}>Demo Application</Text>
+          {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> :
+            <Text style={[styles.heading2, styles.white]}></Text>}
+          <Text style={[styles.heading2, styles.white]}>
+            Please enter your verification code to continue.
+          </Text>
+          <TextInput
+            style={[styles.input, styles.white]}
+            placeholder="Enter Verification Pin"
+            placeholderTextColor="white"
+            keyboardType="numeric"
+            returnKeyType="done"
+            autoCapitalize="none"
+            onChangeText={text => setPin(text)}
+            value={pin}
+          />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Verification Pin"
-        keyboardType="numeric"
-        autoCapitalize="none"
-        onChangeText={text => setPin(text)}
-        value={pin}
-      />
-
-      <TouchableOpacity onPress={verifyHandler} style={[styles.button, styles.enabledButton]}>
-        <Text style={styles.buttonText}>Verify Me!</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            onPress={verifyHandler}
+            style={[styles.button, styles.enabledButton]}>
+            <Text style={styles.buttonText}>Verify Me!</Text>
+          </TouchableOpacity>
+          <Text></Text>
+          <TouchableOpacity
+            onPress={cancelHandler}
+            style={[styles.button, styles.enabledButton]}>
+            <Text style={styles.buttonText}>Cancel Request</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
     </View>
   );
 };

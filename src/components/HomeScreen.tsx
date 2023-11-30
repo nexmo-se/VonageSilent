@@ -1,24 +1,30 @@
-// screens/Home.js
-import React, {useEffect} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
-import {getUniqueId} from 'react-native-device-info';
-import {SERVER_BASE_URL} from '@env';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, Image, ImageBackground, Alert } from 'react-native';
+import { getUniqueId } from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {styles} from '../public/styles';
-import {getPhone} from '../utils/deviceUtil';
-
+import { styles } from '../public/styles';
+import { getPhone, getServer } from '../utils/deviceUtil';
+import { FLAVOR, LOGO, BACKGROUND } from '@env'
 interface Props {
   navigation: any;
 }
-
+const logo = LOGO ? LOGO : 'vonage.png';
+var back = '';
+console.log("ENV Background is " + BACKGROUND);
+if (BACKGROUND !== undefined) {
+  back = require('../assets/wpback.jpeg');
+}
+console.log("Logo: " + logo);
 async function createDeviceToken() {
   const deviceId = await getUniqueId();
   const phone = await getPhone();
+  var server = await getServer();
   console.log("Got phone from local repo: ", phone);
   global.myPhone = phone.phone;
   global.myCountry = phone.country;
-  const response = await fetch(
-    `${SERVER_BASE_URL}/device?deviceId=${deviceId}`,
+  console.log("Flavor: ", FLAVOR);
+  var response = await fetch(
+    `${server}/device?deviceId=${deviceId}&flavor=${FLAVOR}`,
     {
       method: 'GET',
       headers: {
@@ -26,8 +32,12 @@ async function createDeviceToken() {
       },
     },
   );
-  const data = await response.json();
-
+  var data = await response.json();
+  if (data.server && (data.server != server)) {
+    console.log("Setting new server URL: ", data.server);
+    await AsyncStorage.setItem('@server', data.server);
+    return false;
+  }
   if (data.token !== 'undefined') {
     try {
       await AsyncStorage.setItem('@device', data.token);
@@ -35,27 +45,65 @@ async function createDeviceToken() {
       console.log(e);
     }
   }
+  return true;
 }
-
-function HomeScreen({navigation}: Props) {
-  const onScreenLoad = async () => {
-    createDeviceToken();
-    console.log("onScreenLoad creating token")
+const createClearAlert = async () =>
+  Alert.alert('Clear Settings', 'Clear all settings and reset to the defaults (including backend server)', [
+    {
+      text: 'Cancel',
+      onPress: () => console.log('Cancel Pressed'),
+      style: 'cancel',
+    },
+    {
+      text: 'OK', onPress: async () => {
+        console.log('OK Pressed');
+        AsyncStorage.removeItem('@server');
+        AsyncStorage.removeItem('@phone');
+        AsyncStorage.removeItem('@country');
+        AsyncStorage.removeItem('@device');
+        AsyncStorage.removeItem('@auth');
+        await startup();
+      }
+    },
+  ]);
+async function startup() {
+  if (!(await createDeviceToken())) {
+    console.log("Retrying on backend change.");
+    createDeviceToken(); //Change of backend!  Retry
   };
-
+}
+function HomeScreen({ navigation }: Props) {
+  const onScreenLoad = async () => {
+    // if (!(await createDeviceToken())) {
+    //   console.log("Retrying on backend change.");
+    //   createDeviceToken(); //Change of backend!  Retry
+    // };
+    await startup();
+  };
   useEffect(() => {
     onScreenLoad();
   });
-
   return (
     <View style={styles.view}>
-      <Text style={styles.heading}>Welcome to the Vonage SilentAuth Demo Application</Text>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Login')}
-        style={[styles.button, styles.enabledButton]}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-    </View>
+      <ImageBackground source={back} resizeMode="cover" style={styles.Background} >
+        <View style={styles.overlay}>
+          <Image source={require('../assets/' + logo)} style={styles.Image} />
+          <Text style={[styles.heading, styles.white]} >Welcome to the</Text>
+          <Text style={[styles.heading2, styles.white]}>{FLAVOR == 'westpac' ? 'Westpac' : 'Vonage'} SilentAuth</Text>
+          <Text style={[styles.heading2, styles.white]}>Demo Application</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Login')}
+            style={[styles.button, styles.enabledButton]}>
+            <Text style={styles.buttonText}>Start</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => createClearAlert()}
+            style={[styles.button, styles.enabledButton, styles.bottomButton]}>
+            <Text style={styles.buttonText}>Clear Settings</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground >
+    </View >
   );
 }
 

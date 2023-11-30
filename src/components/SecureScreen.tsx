@@ -1,12 +1,18 @@
-import React, {useState, useEffect} from 'react';
-import {TouchableOpacity, View, Text} from 'react-native';
-import {StackScreenProps} from '@react-navigation/stack';
-import {SERVER_BASE_URL} from '@env';
+import React, { useState, useEffect } from 'react';
+import { TouchableOpacity, View, Text, Image, ImageBackground } from 'react-native';
+import { StackScreenProps } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getDeviceToken} from '../utils/deviceUtil';
-import {styles} from '../public/styles';
+import { getDeviceToken, getServer } from '../utils/deviceUtil';
+import { styles } from '../public/styles';
+import { FLAVOR, LOGO, BACKGROUND } from '@env'
+const logo = LOGO ? LOGO : 'vonage.png';
+var back = '';
+console.log("ENV Background is " + BACKGROUND);
+if (BACKGROUND !== undefined) {
+  back = require('../assets/wpback.jpeg');
+}
 
-const SecureScreen = ({navigation}: StackScreenProps<{HomeScreen: any}>) => {
+const SecureScreen = ({ navigation }: StackScreenProps<{ HomeScreen: any }>) => {
   const [phoneNumber, setPhoneNumber] = useState('');
 
   const onScreenLoad = async () => {
@@ -20,7 +26,8 @@ const SecureScreen = ({navigation}: StackScreenProps<{HomeScreen: any}>) => {
 
     if (token) {
       const deviceToken = await getDeviceToken();
-      const response = await fetch(`${SERVER_BASE_URL}/secured-page`, {
+      const server = await getServer();
+      const response = await fetch(`${server}/secured-page`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -54,25 +61,36 @@ const SecureScreen = ({navigation}: StackScreenProps<{HomeScreen: any}>) => {
       console.log(e);
     }
 
-    navigation.navigate('Login');
+    navigation.navigate('Home');
   };
 
   return (
     <View style={styles.view}>
-      <Text style={styles.heading}>
-        Welcome to the Secure Section of the Vonage SilentAuth Demo Application
-      </Text>
-      <Text style={styles.subHeading}>
-        This is a secure screen! You will only see this if you've verified
-        yourself with your phone number.
-      </Text>
-      <Text style={styles.subHeading}>
-        Here is your phone number, retrieved from an authenticated endpoint on
-        the server: {phoneNumber}.
-      </Text>
-      <TouchableOpacity onPress={logoutHandler} style={[styles.button, styles.enabledButton]}>
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
+      <ImageBackground source={back} resizeMode="cover" style={styles.Background} >
+        <View style={back ? styles.overlay : ''}>
+          <Image source={require('../assets/' + logo)} style={styles.Image} />
+          <Text style={[styles.heading, styles.white]} >Welcome to the</Text>
+          <Text style={[styles.heading2, styles.white]}>{FLAVOR == 'westpac' ? 'Westpac' : 'Vonage'} SilentAuth</Text>
+          <Text style={[styles.heading2, styles.white]}>Demo Application</Text>
+          <Text style={styles.heading3}>
+            Congratulations!
+          </Text>
+          <Text style={styles.heading3}>
+            Your verification was
+          </Text>
+          <Text style={styles.heading3}>
+            SUCCESSFUL!
+          </Text>
+          <Text style={[styles.subHeading, styles.white]}>
+            Authenticated number: {phoneNumber}.
+          </Text>
+          <TouchableOpacity
+            onPress={logoutHandler}
+            style={[styles.button, styles.enabledButton]}>
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
     </View>
   );
 };
