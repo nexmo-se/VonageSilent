@@ -1,4 +1,5 @@
 PODS:
+  - BEMCheckBox (1.4.1)
   - boost (1.76.0)
   - BVLinearGradient (2.6.2):
     - React-Core
@@ -378,6 +379,9 @@ PODS:
     - React-perflogger (= 0.70.4)
   - RNCAsyncStorage (1.17.10):
     - React-Core
+  - RNCCheckbox (0.5.16):
+    - BEMCheckBox (~> 1.4)
+    - React-Core
   - RNDeviceInfo (10.3.0):
     - React-Core
   - RNGestureHandler (2.8.0):
@@ -385,10 +389,10 @@ PODS:
   - RNScreens (3.18.2):
     - React-Core
     - React-RCTImage
-  - silentauth-sdk-ios (1.0.1)
-  - silentauth-sdk-react-native (1.0.2):
+  - silentauth-sdk-ios (1.0.7)
+  - silentauth-sdk-react-native (1.0.11):
     - React-Core
-    - silentauth-sdk-ios (= 1.0.1)
+    - silentauth-sdk-ios (= 1.0.7)
   - SocketRocket (0.6.0)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -456,6 +460,7 @@ DEPENDENCIES:
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCCheckbox (from `../node_modules/@react-native-community/checkbox`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -464,6 +469,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - BEMCheckBox
     - CocoaAsyncSocket
     - Flipper
     - Flipper-Boost-iOSX
@@ -554,6 +560,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCCheckbox:
+    :path: "../node_modules/@react-native-community/checkbox"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNGestureHandler:
@@ -566,6 +574,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   BVLinearGradient: 34a999fda29036898a09c6a6b728b0b4189e1a44
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
@@ -615,11 +624,12 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 5407e26b5aaafa9b01a08e33653255f8247e7c31
   ReactCommon: abf3605a56f98b91671d0d1327addc4ffb87af77
   RNCAsyncStorage: 0c357f3156fcb16c8589ede67cc036330b6698ca
+  RNCCheckbox: 75255b03e604bbcc26411eb31c4cbe3e3865f538
   RNDeviceInfo: 4701f0bf2a06b34654745053db0ce4cb0c53ada7
   RNGestureHandler: 62232ba8f562f7dea5ba1b3383494eb5bf97a4d3
   RNScreens: 34cc502acf1b916c582c60003dc3089fa01dc66d
-  silentauth-sdk-ios: 8ef7bc15f6aa24a66e4625053abb668587867bd2
-  silentauth-sdk-react-native: ca7f32b947256e62bf9e9ef353ee56ccb555e54e
+  silentauth-sdk-ios: 5eb920c014d277eb48086228c1904aef8a35bffe
+  silentauth-sdk-react-native: fb24abf17d862fdbadaf64d23618bbc978ec882e
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: 1f02ef4ce4469aefc36167138441b27d988282b1
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
