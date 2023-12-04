@@ -111,7 +111,7 @@ const VerifyScreen = ({
           <TouchableOpacity
             onPress={cancelHandler}
             style={[styles.button, styles.enabledButton]}>
-            <Text style={styles.buttonText}>Cancel Request</Text>
+            <Text style={styles.buttonText}>Return to Login</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>
