@@ -133,7 +133,7 @@ const LoginScreen = ({
         );
         if (!failover.sms && !failover.voice) {
           console.log("Got no need for a pin! ", openCheckResponse);
-          setErrorMessage('Error checking the URL over the Cellular Path: ', openCheckResponse.error_description);
+          setErrorMessage('Error checking the URL over the Cellular Path: ' + openCheckResponse.error_description);
           navigation.navigate('Login', { errorMessage: errorMessage });
         } else {
           navigation.navigate('Verify', { requestId: requestId });
