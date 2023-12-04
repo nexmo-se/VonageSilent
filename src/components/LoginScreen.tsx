@@ -113,7 +113,7 @@ const LoginScreen = ({
 
       const openCheckResponse =
         await SilentAuthSdkReactNative.openWithDataCellularWithDebug<CheckResponse>(
-          checkUrl, //url: api-eu-3.vonage.com/
+          checkUrl,
           false
         );
 
@@ -122,8 +122,15 @@ const LoginScreen = ({
         console.log(
           `Error in openWithDataCellular moving onto VerifyScreen: requestID: ${requestId} `,
         );
-        navigation.navigate('Verify', { requestId: requestId, failover: failover });
+        if (!failover.sms && !failover.voice) {
+          console.log("Got no need for a pin! ", openCheckResponse);
+          setErrorMessage('Error checking the URL over the Cellular Path: ', openCheckResponse.error_description);
+          navigation.navigate('Login', { errorMessage: errorMessage });
+        } else {
+          navigation.navigate('Verify', { requestId: requestId });
+        }
       } else if ('http_status' in openCheckResponse) {
+        console.log("OpenCheckResponse: ", openCheckResponse)
         const httpStatus = openCheckResponse.http_status;
         if (httpStatus >= 200) {
           console.log('Resp from silentauth >= 200: ', openCheckResponse);
