@@ -2,6 +2,13 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20,
+  },
   view: {
     flex: 1,
     alignItems: 'center',

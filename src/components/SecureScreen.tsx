@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {TouchableOpacity, View, Text, Image} from 'react-native';
+import {TouchableOpacity, ScrollView, Text, Image} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {SERVER_BASE_URL} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,14 +11,18 @@ const SecureScreen = ({navigation}: StackScreenProps<{HomeScreen: any}>) => {
 
   const onScreenLoad = async () => {
     var token;
+    var forcePassPhoneNumber;
     try {
       token = await AsyncStorage.getItem('@auth');
+      forcePassPhoneNumber = await AsyncStorage.getItem('@auth_phone');
     } catch (e) {
-      console.log(e);
-      navigation.navigate('Login');
+        console.log("get auth error", e);
     }
 
-    if (token) {
+    if (forcePassPhoneNumber) {
+      setPhoneNumber(forcePassPhoneNumber);
+    }
+    else if (token) {
       const deviceToken = await getDeviceToken();
       const response = await fetch(`${SERVER_BASE_URL}/secured-page`, {
         method: 'GET',
@@ -50,6 +54,7 @@ const SecureScreen = ({navigation}: StackScreenProps<{HomeScreen: any}>) => {
     // This is the place to unset everything!!
     try {
       await AsyncStorage.removeItem('@auth');
+      await AsyncStorage.removeItem('@auth_phone');
     } catch (e) {
       console.log(e);
     }
@@ -58,7 +63,7 @@ const SecureScreen = ({navigation}: StackScreenProps<{HomeScreen: any}>) => {
   };
 
   return (
-    <View style={styles.view}>
+  <ScrollView contentContainerStyle={styles.scrollView}>
       <Image source={require('../assets/vonage.png')} style={styles.Image}/>
       <Text style={styles.heading}>Welcome to the</Text>
       <Text style={styles.heading2}>Vonage SilentAuth</Text>
@@ -80,7 +85,7 @@ const SecureScreen = ({navigation}: StackScreenProps<{HomeScreen: any}>) => {
         style={[styles.button, styles.enabledButton]}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 

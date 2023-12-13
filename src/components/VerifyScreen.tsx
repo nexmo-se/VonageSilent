@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Image } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, TextInput, Image } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDeviceToken } from '../utils/deviceUtil';
@@ -73,7 +73,7 @@ const VerifyScreen = ({
   };
 
   return (
-    <View style={styles.view}>
+    <ScrollView contentContainerStyle={styles.scrollView}>
       <Image source={require('../assets/vonage.png')} style={styles.Image} />
       <Text style={styles.heading}>Welcome to the</Text>
       <Text style={styles.heading2}>Vonage SilentAuth</Text>
@@ -106,7 +106,7 @@ const VerifyScreen = ({
         <Text style={styles.buttonText}>Cancel Request</Text>
       </TouchableOpacity>
 
-    </View>
+    </ScrollView>
   );
 };
 

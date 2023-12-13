@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
+  ScrollView,
   Text,
   Keyboard,
   ActivityIndicator,
   TouchableOpacity,
-  ImageBackground,
   Image,
-  Alert,
+  Alert
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-import parsePhoneNumber, { CountryCode } from 'libphonenumber-js';
+import parsePhoneNumber, { CountryCode, PhoneNumber } from 'libphonenumber-js';
 
 import PhoneInput from 'react-native-phone-number-input';
 import { getDeviceToken, getPhone } from '../utils/deviceUtil';
-import { SERVER_BASE_URL } from '@env';
+import { SERVER_BASE_URL, FORCE_PASS_NUMBERS } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { styles } from '../public/styles';
 import CheckBox from '@react-native-community/checkbox';
@@ -25,6 +25,7 @@ import SilentAuthSdkReactNative, {
 const initialState = {
   sms: true,
   voice: false,
+  whatsapp: false,
 };
 
 const LoginScreen = ({
@@ -38,7 +39,9 @@ const LoginScreen = ({
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isPhoneNumberValidState, setIsPhoneNumberValidState] = useState(false);
   const [failover, setFailover] = React.useState(initialState);
-  const [sandbox, setSandbox] = React.useState<boolean>(false);
+  const [requestId, setRequestId] = React.useState('')
+  const [checkUrl, setCheckUrl] = React.useState('')
+  const [submittedNumber, setSubmittedNumber] = React.useState<E164Number | undefined>(undefined)
 
   useEffect(() => {
     const error = route?.params?.errorMessage;
@@ -67,10 +70,11 @@ const LoginScreen = ({
       setIsPhoneNumberValidState(false);
     }
   }, [inputNumber, countryCode]);
+
   const createAlert = () =>
-    Alert.alert('Use Sandbox', 'The Sandbox allows you to test the flow without actually verifying against the cellular network. Sending a phone number ending in an even digit will ALWAYS succeed, and sending an odd will ALWAYS fail. SMS and Voice flows are disabled when using the Sandbox.', [
-      {text: 'OK', onPress: () => console.log('OK Pressed')},
-    ]);
+  Alert.alert('Please Turn On Cellular Data', '', [
+    { text: 'OK', onPress: () => console.log('OK Pressed') },
+  ]);
 
   const loginHandler = async () => {
     Keyboard.dismiss();
@@ -84,9 +88,33 @@ const LoginScreen = ({
     console.log("Setting parameters into storage: ", national, countryCode);
     AsyncStorage.setItem('@phone', national);
     AsyncStorage.setItem('@country', countryCode);
+   
+    setSubmittedNumber(tel)
+
+    let sandbox = false
+    console.log("force pass number ", FORCE_PASS_NUMBERS)
+    console.log("tel ", tel)
+    if (FORCE_PASS_NUMBERS.includes(tel)) {
+      console.log("set sandbox to true ")
+      sandbox = true
+    }
+
+    // Check if mobile data is on
+    const mobileNetworkCheck =
+    await SilentAuthSdkReactNative.openWithDataCellular<CheckResponse>(
+      "https://vids.vonage.com/",
+    );
+    if ('error' in mobileNetworkCheck) {
+      setIsLoading(false);
+      console.log(`Error in openWithDataCellular moving onto VerifyScreen: ${JSON.stringify(mobileNetworkCheck)}`);
+      //cancel request
+      createAlert()
+      return;
+    }
+
     // Step 1 - Make POST to /login
     console.log("Failover object: ", failover, " Sandbox: ", sandbox);
-    const body = { phone_number: tel, country_code: countryCode, failover: failover, sandbox: sandbox };
+    const body = { phone_number: tel, country_code: countryCode, failover: failover, sandbox: sandbox };    
     const loginResponse = await fetch(`${SERVER_BASE_URL}/login`, {
       method: 'POST',
       headers: {
@@ -97,10 +125,11 @@ const LoginScreen = ({
       body: JSON.stringify(body),
     });
     const data = await loginResponse.json();
+
     if (loginResponse.status === 200) {
       const requestId = data.requestId;
       const checkUrl = data.checkUrl; // Vonage CheckURL
-      console.log(`Response from server: ${{ data }}`);
+      console.log(`Response from server: ${JSON.stringify({ data })}`);
       console.log(`checkurl from login ${checkUrl}`);
       console.log(`1 requestId from POST/login: ${requestId}`);
 
@@ -111,17 +140,14 @@ const LoginScreen = ({
 
       if ('error' in openCheckResponse) {
         setIsLoading(false);
-        console.log(
-          `Error in openWithDataCellular moving onto VerifyScreen: requestID: ${requestId} `,
-        );
-        navigation.navigate('Verify', { requestId: requestId, failover: failover });
+        console.log(`Error in openWithDataCellular moving onto VerifyScreen: ${JSON.stringify(openCheckResponse)}`);
       } else if ('http_status' in openCheckResponse) {
         const httpStatus = openCheckResponse.http_status;
         if (httpStatus >= 200) {
           console.log('Resp from silentauth >= 200');
           if (openCheckResponse.response_body) {
             const rBody = openCheckResponse.response_body;
-            console.log(`SilentAuthResponse Body: ${rBody} ---`);
+            console.log(`SilentAuthResponse Body: ${JSON.stringify(rBody)} ---`);
             if ('code' in rBody) {
               const code = rBody.code;
               console.log(`code: ${code}`);
@@ -163,7 +189,17 @@ const LoginScreen = ({
             } else {
               setIsLoading(false);
               console.log('Before Verify No Code...');
-              if (!failover.sms && !failover.voice) {
+                        // Force sandbox to go Secure Screen
+              if (sandbox) {
+                try {
+                  await AsyncStorage.setItem('@auth_phone', tel?.toString());
+                  navigation.navigate('Secure');
+                  return
+                } catch (e) {
+                  console.log(e);
+                }
+              }
+              else if (!failover.sms && !failover.voice &&  !failover.whatsapp) {
                 console.log("Got no pin!");
                 setErrorMessage('This device is not the one specified, and you have no failover verification method chosen.');
                 navigation.navigate('Login', { errorMessage: errorMessage });
@@ -181,14 +217,14 @@ const LoginScreen = ({
         }
       }
     } else {
-      console.log(`Error response from server: ${{ data }}`);
+      console.log(`Error response from server: ${JSON.stringify({ data })}`);
       setErrorMessage(`Error in login: ${data.error}`);
       setIsLoading(false);
     }
   };
 
   return (
-    <View style={styles.view}>
+    <ScrollView contentContainerStyle={styles.scrollView}>
       <Image source={require('../assets/vonage.png')} style={styles.Image} />
       <Text style={styles.heading}>Welcome to the</Text>
       <Text style={styles.heading2}>Vonage SilentAuth</Text>
@@ -199,7 +235,7 @@ const LoginScreen = ({
       <Text style={styles.errorText}>{errorMessage}</Text>
       <PhoneInput
         defaultValue={defaultNumber}
-        defaultCode="US"
+        defaultCode={countryCode}
         textInputProps={{ returnKeyType: "done" }}
         onChangeText={text => {
           setInputNumber(text);
@@ -219,9 +255,6 @@ const LoginScreen = ({
               ...failover,
               sms: value,
             })
-            if (value) {
-              setSandbox(false);
-            }
           }
           }
         />
@@ -229,41 +262,30 @@ const LoginScreen = ({
       </View>
       <View style={styles.checkboxWrapper}>
         <CheckBox
+          value={failover.whatsapp}
+          onValueChange={value => {
+            setFailover({
+              ...failover,
+              whatsapp: value,
+            })
+          }
+          }
+        />
+        <Text style={styles.checkboxLabel}>Failover to Whatsapp</Text>
+      </View>
+      {/* <View style={styles.checkboxWrapper}>
+        <CheckBox
           value={failover.voice}
           onValueChange={value => {
             setFailover({
               ...failover,
               voice: value,
             })
-            if (value) {
-              setSandbox(false);
-            }
           }
           }
         />
         <Text style={styles.checkboxLabel}>Failover to Voice</Text>
-      </View>
-      <View style={styles.checkboxWrapper}>
-        <CheckBox
-          value={sandbox}
-          onValueChange={value => {
-            setSandbox(value);
-            if (value) {
-              createAlert();
-              setFailover({
-                ...failover,
-                voice: false,
-              })
-              setFailover({
-                ...failover,
-                sms: false,
-              })
-            }
-          }
-          }
-        />
-        <Text style={styles.checkboxLabel2}>Use Sandbox</Text>
-      </View>
+      </View> */}
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator
@@ -284,7 +306,7 @@ const LoginScreen = ({
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
