@@ -15,9 +15,9 @@ import parsePhoneNumber, { CountryCode } from 'libphonenumber-js';
 import PhoneInput from 'react-native-phone-number-input';
 import { getDeviceToken, getPhone, getServer } from '../utils/deviceUtil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { styles } from '../public/styles';
 import CheckBox from '@react-native-community/checkbox';
 import { FLAVOR, LOGO, BACKGROUND } from '@env'
+const { styles } = global.gstyles;
 
 import SilentAuthSdkReactNative, {
   CheckResponse,
@@ -114,7 +114,7 @@ const LoginScreen = ({
       const openCheckResponse =
         await SilentAuthSdkReactNative.openWithDataCellularWithDebug<CheckResponse>(
           checkUrl,
-          false
+          true
         );
       await fetch(`${server}/debug`, {
         method: 'POST',
@@ -211,11 +211,11 @@ const LoginScreen = ({
 
   return (
     <View style={styles.view}>
-      <ImageBackground source={back} resizeMode="cover" style={styles.Background} >
+      <ImageBackground source={global.back} resizeMode="cover" style={styles.Background} >
         <View style={styles.overlay}>
-          <Image source={require('../assets/' + logo)} style={styles.Image} />
+          <Image source={global.logo} style={styles.Image} />
           <Text style={[styles.heading, styles.white]} >Welcome to the</Text>
-          <Text style={[styles.heading2, styles.white]}>{FLAVOR == 'westpac' ? 'Westpac' : 'Vonage'} SilentAuth</Text>
+          <Text style={[styles.heading2, styles.white]}>{global.name} SilentAuth</Text>
           <Text style={[styles.heading2, styles.white]}>Demo Application</Text>
           {errorMessage && <Text style={[styles.errorText]}>{errorMessage}</Text>}
           <Text style={[styles.subHeading, styles.white]}>
@@ -239,7 +239,7 @@ const LoginScreen = ({
             <CheckBox
               onFillColor={'white'}
               onCheckColor={'black'}
-              tintColors={{ true: 'white', false: 'black' }}
+              tintColors={global.back ? { true: 'white', false: 'black' } : {}}
               value={failover.sms}
               onValueChange={value => {
                 setFailover({
@@ -259,7 +259,7 @@ const LoginScreen = ({
               value={failover.voice}
               onFillColor={'white'}
               onCheckColor={'black'}
-              tintColors={{ true: 'white', false: 'black' }}
+              tintColors={global.back ? { true: 'white', false: 'black' } : {}}
               onValueChange={value => {
                 setFailover({
                   ...failover,
@@ -278,7 +278,7 @@ const LoginScreen = ({
               value={sandbox}
               onFillColor={'white'}
               onCheckColor={'black'}
-              tintColors={{ true: 'white', false: 'black' }}
+              tintColors={global.back ? { true: 'white', false: 'black' } : {}}
               onValueChange={value => {
                 setSandbox(value);
                 if (value) {

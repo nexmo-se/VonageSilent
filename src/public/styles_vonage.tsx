@@ -28,12 +28,12 @@ export const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     fontWeight: 'bold',
-    color: 'limegreen',
+    color: 'green',
     alignItems: 'center',
     justifyContent: 'center',
     textShadowColor: 'rgba(0, 0, 0, 1.0)',
     textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 30,
+    textShadowRadius: 1,
   },
   subHeading: {
     fontSize: 15,
@@ -72,10 +72,12 @@ export const styles = StyleSheet.create({
   },
   errorText: {
     color: '#FF0000',
-    fontSize: 15,
+    fontSize: 20,
+    fontWeight: 'bold',
     marginBottom: 20,
     marginLeft: 20,
     marginRight: 20,
+    justifyContent: 'center',
   },
   loadingContainer: {
     marginTop: 40,
@@ -118,19 +120,17 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    backgroundColor: 'rgba(255,0,0,0.5)',
   },
   overlay: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0)',
   },
   white: {
-    color: 'white',
-    textShadowColor: 'rgba(0, 0, 0, 1.75)',
+    color: 'magenta',
+    textShadowColor: 'pink',
     textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
+    textShadowRadius: 2,
   }
 });

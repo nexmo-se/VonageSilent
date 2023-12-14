@@ -2,19 +2,15 @@ import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, ImageBackground, Alert } from 'react-native';
 import { getUniqueId } from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { styles } from '../public/styles';
 import { getPhone, getServer } from '../utils/deviceUtil';
 import { FLAVOR, LOGO, BACKGROUND } from '@env'
 interface Props {
   navigation: any;
 }
-const logo = LOGO ? LOGO : 'vonage.png';
-var back = '';
-console.log("ENV Background is " + BACKGROUND);
-if (BACKGROUND !== undefined) {
-  back = require('../assets/wpback.jpeg');
-}
-console.log("Logo: " + logo);
+const { styles } = global.gstyles;
+console.log("Background: ", global.back);
+console.log("Logo: " + global.logo);
+//const lg = require('../assets/' + global.logo);
 async function createDeviceToken() {
   const deviceId = await getUniqueId();
   const phone = await getPhone();
@@ -85,11 +81,11 @@ function HomeScreen({ navigation }: Props) {
   });
   return (
     <View style={styles.view}>
-      <ImageBackground source={back} resizeMode="cover" style={styles.Background} >
+      <ImageBackground source={global.back} resizeMode="cover" style={styles.Background} >
         <View style={styles.overlay}>
-          <Image source={require('../assets/' + logo)} style={styles.Image} />
+          <Image source={global.logo} style={styles.Image} />
           <Text style={[styles.heading, styles.white]} >Welcome to the</Text>
-          <Text style={[styles.heading2, styles.white]}>{FLAVOR == 'westpac' ? 'Westpac' : 'Vonage'} SilentAuth</Text>
+          <Text style={[styles.heading2, styles.white]}>{global.name} SilentAuth</Text>
           <Text style={[styles.heading2, styles.white]}>Demo Application</Text>
           <TouchableOpacity
             onPress={() => navigation.navigate('Login')}

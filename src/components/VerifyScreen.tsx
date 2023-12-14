@@ -3,14 +3,8 @@ import { View, Text, TouchableOpacity, TextInput, Image, ImageBackground } from 
 import { StackScreenProps } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDeviceToken, getServer } from '../utils/deviceUtil';
-import { styles } from '../public/styles';
 import { FLAVOR, LOGO, BACKGROUND } from '@env'
-const logo = LOGO ? LOGO : 'vonage.png';
-var back = '';
-console.log("ENV Background is " + BACKGROUND);
-if (BACKGROUND !== undefined) {
-  back = require('../assets/wpback.jpeg');
-}
+const { styles } = global.gstyles;
 const VerifyScreen = ({
   navigation,
   route,
@@ -80,11 +74,11 @@ const VerifyScreen = ({
 
   return (
     <View style={styles.view}>
-      <ImageBackground source={back} resizeMode="cover" style={styles.Background} >
+      <ImageBackground source={global.back} resizeMode="cover" style={styles.Background} >
         <View style={styles.overlay}>
-          <Image source={require('../assets/' + logo)} style={styles.Image} />
+          <Image source={global.logo} style={styles.Image} />
           <Text style={[styles.heading, styles.white]} >Welcome to the</Text>
-          <Text style={[styles.heading2, styles.white]}>{FLAVOR == 'westpac' ? 'Westpac' : 'Vonage'} SilentAuth</Text>
+          <Text style={[styles.heading2, styles.white]}>{global.name} SilentAuth</Text>
           <Text style={[styles.heading2, styles.white]}>Demo Application</Text>
           {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> :
             <Text style={[styles.heading2, styles.white]}></Text>}
