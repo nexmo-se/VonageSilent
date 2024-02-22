@@ -132,5 +132,26 @@ export const styles = StyleSheet.create({
     textShadowColor: 'pink',
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 2,
-  }
+  },
+  captionText: {
+    fontSize: 16,
+    position: 'absolute',
+    alignItems: 'center',
+    bottom: 24,
+    fontWeight: 'bold',
+  },
+  versionText: {
+    fontSize: 16,
+    position: 'absolute',
+    alignItems: 'center',
+    bottom: 2,
+    fontWeight: 'bold',
+  },
+  pinkish: {
+    color: 'pink',
+    textShadowColor: 'rgba(0, 0, 0, 1.75)',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 10,
+  },
+
 });

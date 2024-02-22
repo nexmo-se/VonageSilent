@@ -98,6 +98,8 @@ function HomeScreen({ navigation }: Props) {
             <Text style={styles.buttonText}>Clear Settings</Text>
           </TouchableOpacity>
         </View>
+        <Text style={styles.versionText}>V0.12</Text>
+        <Text style={styles.captionText}>Powered by Vonage</Text>
       </ImageBackground >
     </View >
   );

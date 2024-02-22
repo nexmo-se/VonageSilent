@@ -44,6 +44,7 @@ const LoginScreen = ({
   const [isPhoneNumberValidState, setIsPhoneNumberValidState] = useState(false);
   const [failover, setFailover] = React.useState(initialState);
   const [sandbox, setSandbox] = React.useState<boolean>(false);
+  const [debug, setDebug] = React.useState<boolean>(false);
   useEffect(() => {
     const error = route?.params?.errorMessage;
 
@@ -54,21 +55,18 @@ const LoginScreen = ({
 
   useEffect(() => {
     const phoneNumber = parsePhoneNumber(inputNumber, countryCode);
-
+    console.log("Validating: ", inputNumber, countryCode);
     if (phoneNumber?.isValid()) {
       setIsPhoneNumberValidState(true);
     } else {
-      setIsPhoneNumberValidState(false);
-    }
-  }, [inputNumber, countryCode]);
-
-  useEffect(() => {
-    const phoneNumber = parsePhoneNumber(inputNumber, countryCode);
-
-    if (phoneNumber?.isValid()) {
-      setIsPhoneNumberValidState(true);
-    } else {
-      setIsPhoneNumberValidState(false);
+      if (countryCode == 'AU' && inputNumber?.length > 8) {
+        console.log("Setting validation true");
+        setIsPhoneNumberValidState(true);
+      }
+      else {
+        console.log("Setting validation false");
+        setIsPhoneNumberValidState(false);
+      }
     }
   }, [inputNumber, countryCode]);
   const createAlert = () =>
@@ -76,6 +74,18 @@ const LoginScreen = ({
       { text: 'OK', onPress: () => console.log('OK Pressed') },
     ]);
   const loginHandler = async () => {
+    const sendDebug = (stuff) => {
+      fetch(`${server}/debug`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'silent-auth': deviceToken?.token,
+          'device-id': deviceToken?.deviceId,
+        },
+        body: JSON.stringify(stuff),
+      });
+    };
+
     Keyboard.dismiss();
     setErrorMessage('');
     setIsLoading(true);
@@ -116,16 +126,9 @@ const LoginScreen = ({
           checkUrl,
           true
         );
-      await fetch(`${server}/debug`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'silent-auth': deviceToken?.token,
-          'device-id': deviceToken?.deviceId,
-        },
-        body: JSON.stringify(openCheckResponse),
-      });
-
+      if (debug) {
+        sendDebug({ debug: openCheckResponse })
+      }
       if ('error' in openCheckResponse) {
         setIsLoading(false);
         console.log(
@@ -254,45 +257,65 @@ const LoginScreen = ({
             />
             <Text style={[styles.checkboxLabel, styles.white]}>Failover to SMS</Text>
           </View>
-          <View style={styles.checkboxWrapper}>
-            <CheckBox
-              value={failover.voice}
-              onFillColor={'white'}
-              onCheckColor={'black'}
-              tintColors={global.back ? { true: 'white', false: 'black' } : {}}
-              onValueChange={value => {
-                setFailover({
-                  ...failover,
-                  voice: value,
-                })
-                if (value) {
-                  setSandbox(false);
-                }
-              }
-              }
-            />
-            <Text style={[styles.checkboxLabel, styles.white]}>Failover to Voice</Text>
-          </View>
-          <View style={styles.checkboxWrapper}>
-            <CheckBox
-              value={sandbox}
-              onFillColor={'white'}
-              onCheckColor={'black'}
-              tintColors={global.back ? { true: 'white', false: 'black' } : {}}
-              onValueChange={value => {
-                setSandbox(value);
-                if (value) {
-                  createAlert();
+          {false && (
+            <View style={styles.checkboxWrapper}>
+              <CheckBox
+                value={failover.voice}
+                onFillColor={'white'}
+                onCheckColor={'black'}
+                tintColors={global.back ? { true: 'white', false: 'black' } : {}}
+                onValueChange={value => {
                   setFailover({
                     ...failover,
-                    voice: false, sms: false
-                  });
+                    voice: value,
+                  })
+                  if (value) {
+                    setSandbox(false);
+                  }
+                }
+                }
+              />
+              <Text style={[styles.checkboxLabel, styles.white]}>Failover to Voice</Text>
+            </View>
+          )}
+          <View style={styles.checkboxWrapper}>
+            <CheckBox
+              value={debug}
+              onFillColor={'white'}
+              onCheckColor={'black'}
+              tintColors={global.back ? { true: 'white', false: 'black' } : {}}
+              onValueChange={value => {
+                setDebug(value);
+                if (value) {
                 }
               }
               }
             />
-            <Text style={[styles.checkboxLabel2, styles.pinkish]}>Use Sandbox</Text>
+            <Text style={[styles.checkboxLabel2, styles.pinkish]}>Send Debug</Text>
           </View>
+
+          {false && (
+            <View style={styles.checkboxWrapper}>
+              <CheckBox
+                value={sandbox}
+                onFillColor={'white'}
+                onCheckColor={'black'}
+                tintColors={global.back ? { true: 'white', false: 'black' } : {}}
+                onValueChange={value => {
+                  setSandbox(value);
+                  if (value) {
+                    createAlert();
+                    setFailover({
+                      ...failover,
+                      voice: false, sms: false
+                    });
+                  }
+                }
+                }
+              />
+              <Text style={[styles.checkboxLabel2, styles.pinkish]}>Use Sandbox</Text>
+            </View>
+          )}
           {isLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator
@@ -314,6 +337,8 @@ const LoginScreen = ({
             </TouchableOpacity>
           )}
         </View>
+        <Text style={styles.versionText}>V0.12</Text>
+        <Text style={styles.captionText}>Powered by Vonage</Text>
       </ImageBackground>
     </View>
   );

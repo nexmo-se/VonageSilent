@@ -136,5 +136,23 @@ export const styles = StyleSheet.create({
   },
   tint: {
     tintColors: 'white'
-  }
+  },
+  captionText: {
+    fontSize: 16,
+    position: 'absolute',
+    alignItems: 'center',
+    bottom: 24,
+    fontWeight: 'bold',
+  },
+  versionText: {
+    fontSize: 16,
+    position: 'absolute',
+    alignItems: 'center',
+    bottom: 2,
+    fontWeight: 'bold',
+  },
+  pinkish: {
+    color: 'black',
+  },
+
 });

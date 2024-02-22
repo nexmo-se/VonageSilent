@@ -108,6 +108,8 @@ const VerifyScreen = ({
             <Text style={styles.buttonText}>Return to Login</Text>
           </TouchableOpacity>
         </View>
+        <Text style={styles.versionText}>V0.12</Text>
+        <Text style={styles.captionText}>Powered by Vonage</Text>
       </ImageBackground>
     </View>
   );
